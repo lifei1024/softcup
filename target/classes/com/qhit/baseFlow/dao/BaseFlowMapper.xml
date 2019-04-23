@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.qhit.baseFlow.dao.IBaseFlowDao"> 
+	<!-- 自定义结果集 --> 
+	<resultMap id="BaseResultMap" type="com.qhit.baseFlow.pojo.BaseFlow"> 
+		<id property="flowid" column="flowid" javaType="java.lang.Integer"></id> 
+		<result property="flowname" column="flowname" javaType="java.lang.String"></result> 
+		<result property="dljid" column="dljid" javaType="java.lang.Integer"></result> 
+		<result property="zcjid" column="zcjid" javaType="java.lang.Integer"></result> 
+		<result property="pdjid" column="pdjid" javaType="java.lang.Integer"></result> 
+		<result property="compid" column="compid" javaType="java.lang.Integer"></result> 
+	</resultMap>
+	<resultMap id="baseFlowResultMap" type="com.qhit.baseFlow.pojo.BaseFlow">
+		<id property="flowid" column="flowid" javaType="java.lang.Integer"></id>
+		<result property="flowname" column="flowname" javaType="java.lang.String"></result>
+		<result property="dljname" column="dljname"></result>
+		<result property="zcjname" column="zcjname"></result>
+		<result property="pdjname" column="pdjname"></result>
+		<result property="compname" column="compname"></result>
+	</resultMap>
+
+	<!-- 在各种标签中，id属性必须与接口中的方法名一样，id的值必须是唯一的，parameterType指查询时使用的参数类型， 
+	resultType属性指明查询返回的结果集类型    --> 
+ 
+	<sql id="Base_Column_List" > 
+		flowid,flowname,dljid,zcjid,pdjid,compid 
+	</sql> 
+	<select id="findById" resultMap="baseFlowResultMap" parameterType="java.lang.Integer" >
+<!--		select -->
+<!--		<include refid="Base_Column_List" /> -->
+<!--		from base_flow -->
+<!--		where flowid = #{flowid} -->
+		SELECT bf.*,bd1.devname AS dljname,bd2.devname AS zcjname,bd3.devname AS pdjname,bc.compname
+		FROM base_flow bf LEFT JOIN base_device bd1 ON bf.dljid=bd1.devid
+		LEFT JOIN base_device bd2 ON bf.zcjid=bd2.devid
+		LEFT JOIN base_device bd3 ON bf.pdjid=bd3.devid
+		LEFT JOIN base_company bc ON bf.compid=bc.compid
+		WHERE bf.flowid = #{flowid}
+	</select> 
+	<delete id="delete" parameterType="java.lang.Integer" > 
+		delete from base_flow 
+		where flowid = #{flowid} 
+	</delete> 
+	<insert id="insert" parameterType="com.qhit.baseFlow.pojo.BaseFlow" > 
+		insert into base_flow(flowname,dljid,zcjid,pdjid,compid) 
+		values (#{flowname},#{dljid},#{zcjid},#{pdjid},#{compid}) 
+	</insert> 
+	<update id="updateSelective" parameterType="com.qhit.baseFlow.pojo.BaseFlow" > 
+		update base_flow 
+		<set > 
+			<if test="flowname != null and flowname!='' " > 
+				flowname = #{flowname}, 
+			</if> 
+			<if test="dljid != null and dljid!='' " > 
+				dljid = #{dljid}, 
+			</if> 
+			<if test="zcjid != null and zcjid!='' " > 
+				zcjid = #{zcjid}, 
+			</if> 
+			<if test="pdjid != null and pdjid!='' " > 
+				pdjid = #{pdjid}, 
+			</if> 
+			<if test="compid != null and compid!='' " > 
+				compid = #{compid}, 
+			</if> 
+		</set> 
+		where flowid = #{flowid} 
+	</update> 
+	<update id="update" parameterType="com.qhit.baseFlow.pojo.BaseFlow" > 
+		update base_flow 
+		set  flowname = #{flowname}, dljid = #{dljid}, zcjid = #{zcjid}, pdjid = #{pdjid}, compid = #{compid} 
+		where flowid = #{flowid} 
+	</update> 
+	<select id="findAll" resultMap="baseFlowResultMap" >
+		SELECT bf.flowid,bf.flowname,bd1.devname AS dljname,bd2.devname AS zcjname,bd3.devname AS pdjname,bc.compname
+FROM base_flow bf LEFT JOIN base_device bd1 ON bf.dljid=bd1.devid
+		 LEFT JOIN base_device bd2 ON bf.zcjid=bd2.devid
+		LEFT JOIN base_device bd3 ON bf.pdjid=bd3.devid
+		LEFT JOIN base_company bc ON bf.compid=bc.compid
+
+	</select> 
+	<select id="findByFlowname" resultMap="BaseResultMap" parameterType="java.lang.String" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from base_flow 
+		where flowname = #{flowname} 
+	</select> 
+	<select id="findByDljid" resultMap="BaseResultMap" parameterType="java.lang.Integer" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from base_flow 
+		where dljid = #{dljid} 
+	</select> 
+	<select id="findByZcjid" resultMap="BaseResultMap" parameterType="java.lang.Integer" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from base_flow 
+		where zcjid = #{zcjid} 
+	</select> 
+	<select id="findByPdjid" resultMap="BaseResultMap" parameterType="java.lang.Integer" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from base_flow 
+		where pdjid = #{pdjid} 
+	</select> 
+	<select id="findByCompid" resultMap="BaseResultMap" parameterType="java.lang.Integer" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from base_flow 
+		where compid = #{compid} 
+	</select> 
+	<delete id="deleteBatch" parameterType="java.util.Arrays"> 
+		delete from base_flow where flowid in 
+		<foreach collection="array" item="id" open="(" close=")" separator=","> 
+			#{id} 
+		</foreach> 
+	</delete> 
+	<select id="search" parameterType="com.qhit.baseFlow.pojo.BaseFlow" resultMap="BaseResultMap">
+		SELECT bf.flowid,bf.flowname,bd1.devname AS dljname,bd2.devname AS zcjname,bd3.devname AS pdjname,bc.compname
+		FROM base_flow bf LEFT JOIN base_device bd1 ON bf.dljid=bd1.devid
+		LEFT JOIN base_device bd2 ON bf.zcjid=bd2.devid
+		LEFT JOIN base_device bd3 ON bf.pdjid=bd3.devid
+		LEFT JOIN base_company bc ON bf.compid=bc.compid
+		<where >
+			<if test="flowname != null and flowname!='' " > 
+				 and bf.flowname = #{flowname}
+			</if> 
+			<if test="dljid != null and dljid!='' " > 
+				 and bf.dljid = #{dljid}
+			</if> 
+			<if test="zcjid != null and zcjid!='' " > 
+				 and bf.zcjid = #{zcjid}
+			</if> 
+			<if test="pdjid != null and pdjid!='' " > 
+				 and bf.pdjid = #{pdjid}
+			</if> 
+			<if test="compid != null and compid!='' " > 
+				 and bf.compid = #{compid}
+			</if> 
+		</where> 
+	</select> 
+</mapper> 

@@ -1,0 +1,44 @@
+1 从svn下载前端页面，测试
+2 开发报岗功能  list,search方法返回json的数据格式：
+                包含{flowname:'xx',compname:'xx'...}
+   暂时空着的字段：实际到港时间、完成时间、流程
+
+3 结合vue-router官网，讲解一下路由
+
+4 开发中控功能
+  结束作业按钮：
+  开发completeTask方法  接收参数：reportid,flowid,startjobtime,completetime
+  操作表：
+  (1)更新报岗表  更新flowid,startjobtime,completetime
+  (2)插入作业信息表
+  (3)插入能耗信息表
+
+mybatis映射配置
+
+sql语句返回resultset结果集
+
+sid sname sage classid classname 元信息 metadata
+1   xx     xx   xxx     xx
+2   xx     xx   xxx     xx
+
+resultSet遍历
+List list = new List();
+while(rs.next()){
+  Object o = new Object();
+  rs.getString("sname")
+  o.set(result);
+  list.add(o);
+}
+return list;
+反射 resultSet-->List
+for(Object o:list){
+
+}
+前端希望接收的数据格式：json
+后端方便处理的数据格式：List<Object>
+
+如何转换？
+1 手动处理
+2 配置映射关系
+  每条数据映射到一个对象上
+  然后配置：数据库字段：xx java字段:xx

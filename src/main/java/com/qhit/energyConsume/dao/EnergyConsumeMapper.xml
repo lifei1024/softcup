@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.qhit.energyConsume.dao.IEnergyConsumeDao"> 
+	<!-- 自定义结果集 --> 
+	<resultMap id="BaseResultMap" type="com.qhit.energyConsume.pojo.EnergyConsume"> 
+		<id property="consumeid" column="consumeid" javaType="java.lang.Integer"></id> 
+		<result property="devid" column="devid" javaType="java.lang.Integer"></result> 
+		<result property="electric" column="electric" javaType="java.lang.Double"></result> 
+		<result property="water" column="water" javaType="java.lang.Double"></result> 
+		<result property="oil" column="oil" javaType="java.lang.Double"></result> 
+		<result property="reportid" column="reportid" javaType="java.lang.Integer"></result> 
+	</resultMap> 
+
+	<!-- 在各种标签中，id属性必须与接口中的方法名一样，id的值必须是唯一的，parameterType指查询时使用的参数类型， 
+	resultType属性指明查询返回的结果集类型    --> 
+ 
+	<sql id="Base_Column_List" > 
+		consumeid,devid,electric,water,oil,reportid 
+	</sql> 
+	<select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Integer" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from energy_consume 
+		where consumeid = #{consumeid} 
+	</select> 
+	<delete id="delete" parameterType="java.lang.Integer" > 
+		delete from energy_consume 
+		where consumeid = #{consumeid} 
+	</delete> 
+	<insert id="insert" parameterType="com.qhit.energyConsume.pojo.EnergyConsume" > 
+		insert into energy_consume(devid,electric,water,oil,reportid) 
+		values (#{devid},#{electric},#{water},#{oil},#{reportid}) 
+	</insert> 
+	<update id="updateSelective" parameterType="com.qhit.energyConsume.pojo.EnergyConsume" > 
+		update energy_consume 
+		<set > 
+			<if test="devid != null and devid!='' " > 
+				devid = #{devid}, 
+			</if> 
+			<if test="electric != null and electric!='' " > 
+				electric = #{electric}, 
+			</if> 
+			<if test="water != null and water!='' " > 
+				water = #{water}, 
+			</if> 
+			<if test="oil != null and oil!='' " > 
+				oil = #{oil}, 
+			</if> 
+			<if test="reportid != null and reportid!='' " > 
+				reportid = #{reportid}, 
+			</if> 
+		</set> 
+		where consumeid = #{consumeid} 
+	</update> 
+	<update id="update" parameterType="com.qhit.energyConsume.pojo.EnergyConsume" > 
+		update energy_consume 
+		set  devid = #{devid}, electric = #{electric}, water = #{water}, oil = #{oil}, reportid = #{reportid} 
+		where consumeid = #{consumeid} 
+	</update> 
+	<select id="findAll" resultMap="BaseResultMap" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from energy_consume 
+	</select> 
+	<select id="findByDevid" resultMap="BaseResultMap" parameterType="java.lang.Integer" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from energy_consume 
+		where devid = #{devid} 
+	</select> 
+	<select id="findByElectric" resultMap="BaseResultMap" parameterType="java.lang.Double" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from energy_consume 
+		where electric = #{electric} 
+	</select> 
+	<select id="findByWater" resultMap="BaseResultMap" parameterType="java.lang.Double" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from energy_consume 
+		where water = #{water} 
+	</select> 
+	<select id="findByOil" resultMap="BaseResultMap" parameterType="java.lang.Double" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from energy_consume 
+		where oil = #{oil} 
+	</select> 
+	<select id="findByReportid" resultMap="BaseResultMap" parameterType="java.lang.Integer" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from energy_consume 
+		where reportid = #{reportid} 
+	</select> 
+	<delete id="deleteBatch" parameterType="java.util.Arrays"> 
+		delete from energy_consume where consumeid in 
+		<foreach collection="array" item="id" open="(" close=")" separator=","> 
+			#{id} 
+		</foreach> 
+	</delete> 
+	<select id="search" parameterType="com.qhit.energyConsume.pojo.EnergyConsume" resultMap="BaseResultMap"> 
+		select * from  energy_consume 
+		<where > 
+			<if test="devid != null and devid!='' " > 
+				 and devid = #{devid} 
+			</if> 
+			<if test="electric != null and electric!='' " > 
+				 and electric = #{electric} 
+			</if> 
+			<if test="water != null and water!='' " > 
+				 and water = #{water} 
+			</if> 
+			<if test="oil != null and oil!='' " > 
+				 and oil = #{oil} 
+			</if> 
+			<if test="reportid != null and reportid!='' " > 
+				 and reportid = #{reportid} 
+			</if> 
+		</where> 
+	</select>
+	<select id="flowConsume" parameterType="java.lang.String" resultMap="BaseResultMap">
+		SELECT a.flowname,ROUND(((a.ele*b.eles)+(a.wat*c.wats)+(a.oil*d.oils)),2) AS fc FROM
+		(SELECT bf.flowname,pr.flowid,SUM(ec.electric) AS ele,SUM(ec.water) AS wat,SUM(ec.oil) AS oil
+		FROM produce_report pr JOIN energy_consume ec ON pr.reportid=ec.reportid
+		JOIN base_flow bf ON pr.flowid=bf.flowid
+		WHERE MONTH(pr.startjobtime)=#{month} AND YEAR(pr.startjobtime)=#{year} AND pr.compid=#{compid}
+		GROUP BY pr.flowid) a,
+		(SELECT ratio AS eles
+		FROM energy_standradcoal WHERE energetype='电') b,
+		(SELECT ratio AS wats
+		FROM energy_standradcoal WHERE energetype='水') c,
+		(SELECT ratio AS oils
+		FROM energy_standradcoal WHERE energetype='油') d
+	</select>
+	<select id="devTypeConsume" parameterType="java.lang.String" resultMap="BaseResultMap">
+		SELECT a.typename,ROUND(((a.ele*b.eles)+(a.wat*c.wats)+(a.oil*d.oils)),2) AS fc FROM
+		(SELECT bdt.typename,bd.typeid,SUM(ec.electric) AS ele,SUM(ec.water) AS wat,SUM(ec.oil) AS oil
+		FROM energy_consume ec
+		JOIN produce_report pr
+		JOIN base_device bd ON ec.devid=bd.devid
+		JOIN base_devtype bdt ON bd.typeid=bdt.typeid
+		WHERE MONTH(pr.startjobtime)=#{month} AND YEAR(pr.startjobtime)=#{year} AND pr.compid=#{compid}
+		GROUP BY bd.typeid) a,
+		(SELECT ratio AS eles
+		FROM energy_standradcoal WHERE energetype='电') b,
+		(SELECT ratio AS wats
+		FROM energy_standradcoal WHERE energetype='水') c,
+		(SELECT ratio AS oils
+		FROM energy_standradcoal WHERE energetype='油') d
+	</select>
+	<select id="devConsume" parameterType="java.lang.String" resultMap="BaseResultMap">
+		SELECT a.devname,ROUND(((a.ele*b.eles)+(a.wat*c.wats)+(a.oil*d.oils)),2) AS fc FROM
+		(SELECT bd.devname,ec.devid,
+		SUM(ec.electric) AS ele,SUM(ec.water) AS wat,SUM(ec.oil) AS oil
+		FROM energy_consume ec
+		JOIN base_device bd ON ec.devid=bd.devid
+		JOIN produce_report pr ON ec.reportid=pr.reportid
+		WHERE MONTH(pr.startjobtime)=#{month} AND YEAR(pr.startjobtime)=#{year} AND pr.compid=#{compid}
+		GROUP BY ec.devid) a,
+		(SELECT ratio AS eles
+		FROM energy_standradcoal WHERE energetype='电') b,
+		(SELECT ratio AS wats
+		FROM energy_standradcoal WHERE energetype='水') c,
+		(SELECT ratio AS oils
+		FROM energy_standradcoal WHERE energetype='油') d
+	</select>
+	<select id="electricConsume" parameterType="java.lang.String" resultMap="BaseResultMap">
+		SELECT bd.devname,ROUND((SUM(ec.electric)/SUM(pj.amount)),2) AS fc
+		FROM energy_consume ec
+		JOIN base_device bd ON ec.devid=bd.devid
+		JOIN produce_job pj ON ec.devid=pj.devid
+		JOIN produce_report pr ON ec.reportid=pr.reportid
+		WHERE MONTH(pr.startjobtime)=#{month} AND YEAR(pr.startjobtime)=#{year} AND pr.compid=#{compid}
+		GROUP BY bd.devid
+	</select>
+	<select id="waterConsume" parameterType="java.lang.String" resultMap="BaseResultMap">
+		SELECT bd.devname,ROUND((SUM(ec.water)/SUM(pj.amount)),2) AS fc
+		FROM energy_consume ec
+		JOIN base_device bd ON ec.devid=bd.devid
+		JOIN produce_job pj ON ec.devid=pj.devid
+		JOIN produce_report pr ON ec.reportid=pr.reportid
+		WHERE MONTH(pr.startjobtime)=#{month} AND YEAR(pr.startjobtime)=#{year} AND pr.compid=#{compid}
+		GROUP BY bd.devid
+	</select>
+	<select id="oilConsume" parameterType="java.lang.String" resultMap="BaseResultMap">
+		SELECT bd.devname,ROUND((SUM(ec.oil)/SUM(pj.amount)),2) AS fc
+		FROM energy_consume ec
+		JOIN base_device bd ON ec.devid=bd.devid
+		JOIN produce_job pj ON ec.devid=pj.devid
+		JOIN produce_report pr ON ec.reportid=pr.reportid
+		WHERE MONTH(pr.startjobtime)=#{month} AND YEAR(pr.startjobtime)=#{year} AND pr.compid=#{compid}
+		GROUP BY bd.devid
+	</select>
+</mapper> 

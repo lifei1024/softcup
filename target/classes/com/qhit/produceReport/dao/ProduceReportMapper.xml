@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.qhit.produceReport.dao.IProduceReportDao"> 
+	<!-- 自定义结果集 --> 
+	<resultMap id="BaseResultMap" type="com.qhit.produceReport.pojo.ProduceReport"> 
+		<id property="reportid" column="reportid" javaType="java.lang.Integer"></id> 
+		<result property="shipname" column="shipname" javaType="java.lang.String"></result> 
+		<result property="capacity" column="capacity" javaType="java.lang.Float"></result> 
+		<result property="planjobtime" column="planjobtime" javaType="java.lang.String"></result> 
+		<result property="startjobtime" column="startjobtime" javaType="java.lang.String"></result> 
+		<result property="completetime" column="completetime" javaType="java.lang.String"></result> 
+		<result property="flowid" column="flowid" javaType="java.lang.Integer"></result> 
+		<result property="reportuser" column="reportuser" javaType="java.lang.String"></result> 
+		<result property="compid" column="compid" javaType="java.lang.Integer"></result>
+		<result property="flowname" column="flowname"></result>
+		<result property="compname" column="compname"></result>
+		<result property="status" column="status"></result>
+	</resultMap> 
+
+	<!-- 在各种标签中，id属性必须与接口中的方法名一样，id的值必须是唯一的，parameterType指查询时使用的参数类型， 
+	resultType属性指明查询返回的结果集类型    --> 
+ 
+	<sql id="Base_Column_List" > 
+		reportid,shipname,capacity,planjobtime,startjobtime,completetime,flowid,reportuser,compid 
+	</sql> 
+	<select id="findById" resultMap="BaseResultMap" parameterType="java.lang.Integer" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from produce_report 
+		where reportid = #{reportid} 
+	</select> 
+	<delete id="delete" parameterType="java.lang.Integer" > 
+		delete from produce_report 
+		where reportid = #{reportid} 
+	</delete> 
+	<insert id="insert" parameterType="com.qhit.produceReport.pojo.ProduceReport" > 
+		insert into produce_report(shipname,capacity,planjobtime,startjobtime,completetime,flowid,reportuser,compid) 
+		values (#{shipname},#{capacity},#{planjobtime},#{startjobtime},#{completetime},#{flowid},#{reportuser},#{compid}) 
+	</insert> 
+	<update id="updateSelective" parameterType="com.qhit.produceReport.pojo.ProduceReport" > 
+		update produce_report 
+		<set > 
+			<if test="shipname != null and shipname!='' " > 
+				shipname = #{shipname}, 
+			</if> 
+			<if test="capacity != null and capacity!='' " > 
+				capacity = #{capacity}, 
+			</if> 
+			<if test="planjobtime != null and planjobtime!='' " > 
+				planjobtime = #{planjobtime}, 
+			</if> 
+			<if test="startjobtime != null and startjobtime!='' " > 
+				startjobtime = #{startjobtime}, 
+			</if> 
+			<if test="completetime != null and completetime!='' " > 
+				completetime = #{completetime}, 
+			</if> 
+			<if test="flowid != null and flowid!='' " > 
+				flowid = #{flowid}, 
+			</if> 
+			<if test="reportuser != null and reportuser!='' " > 
+				reportuser = #{reportuser}, 
+			</if> 
+			<if test="compid != null and compid!='' " > 
+				compid = #{compid}, 
+			</if> 
+		</set> 
+		where reportid = #{reportid} 
+	</update> 
+	<update id="update" parameterType="com.qhit.produceReport.pojo.ProduceReport" > 
+		update produce_report 
+		set  shipname = #{shipname}, capacity = #{capacity}, planjobtime = #{planjobtime}, startjobtime = #{startjobtime}, completetime = #{completetime}, flowid = #{flowid}, reportuser = #{reportuser}, compid = #{compid} 
+		where reportid = #{reportid} 
+	</update> 
+	<select id="findAll" resultMap="BaseResultMap" > 
+			SELECT pr.*,bf.flowname,bc.compname,(
+	  CASE
+		WHEN pr.startjobtime IS NULL THEN '未完成'
+		WHEN pr.startjobtime IS NOT NULL AND pr.completetime IS NULL THEN '作业中'
+		WHEN pr.completetime IS NOT NULL THEN '已完成'
+	  END
+	)
+	AS STATUS
+	FROM produce_report pr LEFT JOIN base_flow bf ON pr.flowid=bf.flowid
+				LEFT JOIN base_company bc ON pr.compid=bc.compid
+	</select> 
+	<select id="findByShipname" resultMap="BaseResultMap" parameterType="java.lang.String" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from produce_report 
+		where shipname = #{shipname} 
+	</select> 
+	<select id="findByCapacity" resultMap="BaseResultMap" parameterType="java.lang.Float" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from produce_report 
+		where capacity = #{capacity} 
+	</select> 
+	<select id="findByPlanjobtime" resultMap="BaseResultMap" parameterType="java.lang.String" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from produce_report 
+		where planjobtime = #{planjobtime} 
+	</select> 
+	<select id="findByStartjobtime" resultMap="BaseResultMap" parameterType="java.lang.String" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from produce_report 
+		where startjobtime = #{startjobtime} 
+	</select> 
+	<select id="findByCompletetime" resultMap="BaseResultMap" parameterType="java.lang.String" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from produce_report 
+		where completetime = #{completetime} 
+	</select> 
+	<select id="findByFlowid" resultMap="BaseResultMap" parameterType="java.lang.Integer" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from produce_report 
+		where flowid = #{flowid} 
+	</select> 
+	<select id="findByReportuser" resultMap="BaseResultMap" parameterType="java.lang.String" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from produce_report 
+		where reportuser = #{reportuser} 
+	</select> 
+	<select id="findByCompid" resultMap="BaseResultMap" parameterType="java.lang.Integer" > 
+		select 
+		<include refid="Base_Column_List" /> 
+		from produce_report 
+		where compid = #{compid} 
+	</select> 
+	<delete id="deleteBatch" parameterType="java.util.Arrays"> 
+		delete from produce_report where reportid in 
+		<foreach collection="array" item="id" open="(" close=")" separator=","> 
+			#{id} 
+		</foreach> 
+	</delete> 
+	<select id="search" parameterType="com.qhit.produceReport.pojo.ProduceReport" resultMap="BaseResultMap">
+		SELECT pr.*,bf.flowname,bc.compname,(
+		CASE
+		WHEN pr.startjobtime IS NULL THEN '未完成'
+		WHEN pr.startjobtime IS NOT NULL AND pr.completetime IS NULL THEN '作业中'
+		WHEN pr.completetime IS NOT NULL THEN '已完成'
+		END
+		)
+		AS STATUS
+		FROM produce_report pr LEFT JOIN base_flow bf ON pr.flowid=bf.flowid
+		LEFT JOIN base_company bc ON pr.compid=bc.compid
+		<where > 
+			<if test="shipname != null and shipname!='' " > 
+				 and pr.shipname = #{shipname}
+			</if> 
+			<if test="capacity != null and capacity!='' " > 
+				 and  pr.capacity = #{capacity}
+			</if> 
+			<if test="planjobtime != null and planjobtime!='' " > 
+				 and  pr.planjobtime = #{planjobtime}
+			</if> 
+			<if test="startjobtime != null and startjobtime!='' " > 
+				 and startjobtime = #{startjobtime} 
+			</if> 
+			<if test="completetime != null and completetime!='' " > 
+				 and  pr.completetime = #{completetime}
+			</if> 
+			<if test="flowid != null and flowid!='' " > 
+				 and  pr.flowid = #{flowid}
+			</if> 
+			<if test="reportuser != null and reportuser!='' " > 
+				 and  pr.reportuser = #{reportuser}
+			</if> 
+			<if test="compid != null and compid!='' " > 
+				 and  pr.compid = #{compid}
+			</if> 
+		</where> 
+	</select> 
+</mapper> 

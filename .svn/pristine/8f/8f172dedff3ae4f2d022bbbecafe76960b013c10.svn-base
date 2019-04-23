@@ -1,0 +1,5 @@
+1 导入ems项目，并下载pom.xml中的依赖，如果下载的比较慢，可以拷贝maven仓库文件夹
+2 数据库用户名为root 密码为123456 如果数据库密码不一致，需要修改两个地方  如果数据库密码一致，则不需要修改
+    (1) application.yml
+    (2) utils包下的BaseDao类，getConn方法
+3 启动项目，输入网址http://localhost:9000 访问项目

@@ -1,0 +1,4 @@
+1 BaseDevice增删改查
+2 list,search 方法  typeid,compid需要关联
+  通过访问localhost:9000/baseDeive/list方法返回数据格式如下：
+  [{devid:'xx'...,baseDevtype:{},baseCompany:{}]

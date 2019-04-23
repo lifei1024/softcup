@@ -1,0 +1,14 @@
+基本信息模块：
+    base_company：企业信息
+    base_device：设备信息
+    base_devtype：设备类别
+    base_flow：流程信息
+    base_user：用户信息
+生产作业模块：
+    produce_job：作业信息
+    produce_report：报岗
+    produce_fault：故障记录
+    produce_repair：维修记录
+能耗模块：
+    energy_consume：能耗信息
+    energy_standradcoal：折标煤系数

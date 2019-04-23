@@ -1,0 +1,7 @@
+中控功能接口：
+1 http://localhost:9000/produceReport/list
+  返回的json数据，需要包含status字段 该字段与时间有关
+  状态分为：未完成、作业中、已完成
+2 http://localhost:9000/baseFlow/load?flowid=1
+  返回的json数据，需要包含dljname,zcjname,pdjname
+3 http://localhost:9000/produceReport/load?reportid=1

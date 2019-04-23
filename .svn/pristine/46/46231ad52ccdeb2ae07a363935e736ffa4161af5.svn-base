@@ -1,0 +1,14 @@
+1 从svn服务器上下载前端页面，验证成果
+2 实现流程信息功能
+  findDljByCompid  compid:从session中取  typeid=1
+  findCzjByCompid  compid:从session中取  typeid=2
+  findPdjByCompid  compid:从session中取  typeid=3
+  list方法 返回的json数据格式：
+  [{flowid:'xx'...dljname:'xx',zcjname:'',pdjname:'',compname:''}]
+
+3 安装json插件，也可以使用火狐浏览器
+
+4 维修记录 故障信息功能
+  list,search方法 返回的json数据 包含{devname:'xxx'}
+
+

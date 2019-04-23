@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<mapper namespace="com.qhit.reports.dao.IJobDao">
+	<!-- 自定义结果集 -->
+	<resultMap id="JobMap" type="com.qhit.reports.pojo.JobBin">
+		<result property="fname" column="fname" javaType="java.lang.String"></result>
+	</resultMap>
+
+	<!-- 在各种标签中，id属性必须与接口中的方法名一样，id的值必须是唯一的，parameterType指查询时使用的参数类型， 
+	resultType属性指明查询返回的结果集类型    -->
+	<select id="flowAmount" parameterType="java.lang.String" resultMap="JobMap">
+		SELECT CONCAT(s.yf,',',s.NameStr) AS fname FROM
+		(
+		SELECT cd.yf,GROUP_CONCAT(cd.v)  AS NameStr FROM (
+			SELECT db.yf,CONCAT(db.flowname,':',db.capacitys) AS v FROM
+				(SELECT bf.flowname,pr.shipname,SUM(pr.capacity)
+					AS capacitys,CONCAT('月份:',MONTH(pr.startjobtime),'月') AS yf FROM produce_report pr JOIN base_flow bf ON bf.flowid=pr.flowid WHERE MONTH(pr.startjobtime)= #{month} AND YEAR(pr.startjobtime)= #{year} GROUP BY pr.flowid) db
+		) cd GROUP BY cd.yf) s
+	</select>
+	<select id="devtypeAmount" parameterType="com.qhit.reports.pojo.JobBin" resultMap="JobMap">
+		SELECT CONCAT(s.yf,",",s.NameStr) AS fname FROM
+		(SELECT cd.yf,GROUP_CONCAT(cd.v)  AS NameStr FROM
+		(SELECT db.yf,CONCAT(db.typename,':',db.am) AS v FROM
+		(SELECT bd.typeid,bdt.typename,SUM(pj.amount) AS am,CONCAT('月份:',MONTH(pj.starttime),'月') AS yf
+		FROM produce_job pj
+		JOIN base_device bd ON pj.devid=bd.devid
+		JOIN base_devtype bdt ON bd.typeid=bdt.typeid
+		WHERE MONTH(pj.starttime)=#{month} AND YEAR(pj.starttime)=#{year}
+		GROUP BY bd.typeid) db
+		) cd GROUP BY cd.yf) s
+	</select>
+	<select id="devAmount" parameterType="com.qhit.reports.pojo.JobBin" resultMap="JobMap">
+		SELECT CONCAT(s.yf,",",s.NameStr) AS fname FROM
+		(SELECT cd.yf,GROUP_CONCAT(cd.v)  AS NameStr FROM
+		(SELECT db.yf,CONCAT(db.devname,':',db.am) AS v FROM
+		(SELECT bd.devname,pj.devid,SUM(pj.amount) AS am,CONCAT('月份:',MONTH(pj.starttime),'月') AS yf
+		FROM produce_job pj JOIN base_device bd ON pj.devid=bd.devid
+		WHERE MONTH(pj.starttime)=#{month} AND YEAR(pj.starttime)=#{year}
+		GROUP BY pj.devid) db
+		) cd GROUP BY cd.yf) s
+	</select>
+
+
+	<!--	4.16-1-->
+	<select id="selectModel" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT bdv.devname as dev,ROUND(SUM(pj.amount)) AS amount
+		FROM base_device bdv
+		JOIN produce_job pj ON bdv.devid = pj.devid
+		JOIN produce_report pr ON pr.reportid=pj.reportid
+		JOIN base_flow bf ON bf.flowid=pr.flowid
+		WHERE YEAR(pj.starttime)='${year}' AND  bf.flowid = '${baseFlow.flowid}'
+		GROUP BY pj.devid
+	</select>
+
+
+
+
+	<!--	4.16-2-->
+	<select id="selectConsume" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT bdv.devname as dev,ROUND(SUM(ec.electric)*(SELECT es.ratio FROM energy_standradcoal es WHERE es.sid=1)
+		+SUM(ec.water)*(SELECT es.ratio FROM energy_standradcoal es WHERE es.sid=2)
+		+SUM(ec.oil)*(SELECT es.ratio FROM energy_standradcoal es WHERE es.sid=3)) AS consume
+		FROM base_device bdv
+		JOIN energy_consume ec ON bdv.devid = ec.devid
+		JOIN produce_report pr ON pr.reportid=ec.reportid
+		JOIN base_flow bf ON bf.flowid=pr.flowid
+		WHERE YEAR(pr.startjobtime)='${year}' AND bf.flowid = '${baseFlow.flowid}'
+		GROUP BY ec.devid
+	</select>
+
+
+
+
+
+</mapper> 

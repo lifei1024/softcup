@@ -1,0 +1,38 @@
+生产模型-作业量：
+路径：/jobAmount/model  接收参数为:year 查询全年的总数据，不考虑月份
+返回的json数据格式为：
+data1: {
+    comp:'周口港',amount:'aa吨',
+    children:[
+        {flow:'流程1',amount:'bb1吨',children:[
+            {dev:'zk-1#斗轮机',amount:'cc吨'},
+            {dev:'zk-2#装船机',amount:'dd吨'},
+            {dev:'zk-bm1',amount:'ee吨'}
+        ]},
+        {flow:'流程2',amount:'bb2吨',children:[
+            {dev:'zk-2#斗轮机',amount:'cc吨'},
+            {dev:'zk-3#装船机',amount:'dd吨'},
+            {dev:'zk-bm2',amount:'ee吨'}
+        ]},
+        .....
+    ]
+}
+能源消耗模型--折标煤：
+路径：/energyConsume/model  接收参数为:year 查询全年的总数据，不考虑月份
+返回的json数据格式为：
+data2: {
+    comp:'周口港',consume:'aa',
+    children:[
+        {flow:'流程1',consume:'bb1',children:[
+            {dev:'zk-1#斗轮机',consume:'cc'},
+            {dev:'zk-2#装船机',consume:'dd'},
+            {dev:'zk-bm1',consume:'ee'},
+        ]},
+        {flow:'流程2',consume:'bb2',children:[
+            {dev:'zk-2#斗轮机',consume:'cc'},
+            {dev:'zk-3#装船机',consume:'dd'},
+            {dev:'zk-bm2',consume:'ee'},
+        ]},
+        .....
+    ]
+}
